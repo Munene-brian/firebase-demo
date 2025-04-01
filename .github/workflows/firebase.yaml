@@ -29,6 +29,21 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Increment Version Code and Version Name
+        run: |
+          # Get the current versionCode from build.gradle
+          VERSION_CODE=$(grep versionCode app/build.gradle | awk '{print $2}')
+          VERSION_NAME=$(grep versionName app/build.gradle | awk '{print $2}' | sed "s/\"//g")
+
+          # Increment versionCode by 1
+          VERSION_CODE=$((VERSION_CODE + 1))
+
+          # Update the versionCode and versionName in build.gradle
+          sed -i "s/versionCode .*/versionCode $VERSION_CODE/" app/build.gradle
+          sed -i "s/versionName \".*\"/versionName \"$VERSION_NAME\"/" app/build.gradle
+
+          echo "Updated versionCode to $VERSION_CODE"     
         
       - name: Set up local.properties
         run: |
@@ -39,6 +54,13 @@ jobs:
 
       - name: Build app
         run: ./gradlew assembleDebug --stacktrace
+        
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Create custom release notes based on the commit messages or any logic you need
+          RELEASE_NOTES="Release notes for version $VERSION_NAME (Build $VERSION_CODE)."
+          echo "::set-output name=release_notes::$RELEASE_NOTES"  
         
       - name: Find current directory
         run: pwd
@@ -54,4 +76,5 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           groups: testers
           file: app/build/outputs/apk/debug/app-debug.apk
+          releaseNotes: ${{ steps.release_notes.outputs.release_notes }}
           
