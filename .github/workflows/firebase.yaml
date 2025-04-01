@@ -54,4 +54,5 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           groups: testers
           file: app/build/outputs/apk/debug/app-debug.apk
-          releaseNotes: hello test now
+          releaseNotes: 🎉 New Release Deployed
+                        🚨 Test on company network only 🌐 for full functionality.
