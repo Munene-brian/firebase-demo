@@ -46,6 +46,24 @@ jobs:
       - name: Check if APK exists
         run: |
           ls -R
+          
+      - name: Generate Random Release Notes
+        id: release_notes
+        run: |
+          # Define a list of cute release notes
+          NOTES=("🎉 New Release Deployed with Sparkles! ✨"
+                 "🚀 New version is ready to rock! 💥"
+                 "🌈 We've added more joy to the app! 😍"
+                 "🦄 A unicorn just upgraded the app! 🦄"
+                 "✨ Magical updates are here! ✨")
+          
+          # Get a random note from the list
+          RANDOM_NOTE=${NOTES[$RANDOM % ${#NOTES[@]}]}
+          
+          # Add the disclaimer
+          FINAL_RELEASE_NOTES="$RANDOM_NOTE\n🚨 Test on company network only for full functionality for UAT/SIT testing!!"
+          
+          echo "::set-output name=release_notes::$FINAL_RELEASE_NOTES"    
 
       - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
@@ -54,6 +72,4 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           groups: testers
           file: app/build/outputs/apk/debug/app-debug.apk
-          releaseNotes: |
-                  🎉 New Release Deployed for SIT tesing...
-                  🚨 Test on company network only for full functionality!!!
+          releaseNotes: ${{ steps.release_notes.outputs.release_notes }}
