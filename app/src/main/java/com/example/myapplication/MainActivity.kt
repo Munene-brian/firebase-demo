@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name! wayne CARTERT--+_",
+        text = "Hello $name! wayne CARTERT--+__+",
         modifier = modifier
     )
 }
