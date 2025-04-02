@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-
     steps:
 
       - name: Checkout code
         uses: actions/checkout@v4
+
         with:
           ref: ${{ github.event.inputs.branch }}
 
@@ -29,48 +29,24 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
+        
       - name: Set up local.properties
         run: |
           echo "sdk.dir=/usr/local/lib/android/sdk" > local.properties
-
+          
       - name: Grant rights to gradlew
         run: chmod +x ./gradlew
 
-      # Step to get the current version code from build.gradle.kts
-      - name: Get current version code
-        id: get_version_code
-        run: |
-          # Extract versionCode from build.gradle.kts (Kotlin DSL)
-          VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | sed 's/[^0-9]*\([0-9]\+\)[^0-9]*$/\1/')
-          echo "Current version code is $VERSION_CODE"
-          echo "::set-output name=version_code::$VERSION_CODE"
-
-      # Step to increment the version code
-      - name: Increment version code
-        run: |
-          # Get the current version code from the output of the previous step
-          VERSION_CODE=${{ steps.get_version_code.outputs.version_code }}
-          NEW_VERSION_CODE=$((VERSION_CODE + 1))
-          echo "New version code: $NEW_VERSION_CODE"
-          
-          # Update the version code in build.gradle.kts
-          sed -i "s/versionCode $VERSION_CODE/versionCode $NEW_VERSION_CODE/" app/build.gradle.kts
-          
-          # Output the new version code for debugging
-          echo "::set-output name=new_version_code::$NEW_VERSION_CODE"
-
-      # Build the app with the new version code
       - name: Build app
         run: ./gradlew assembleDebug --stacktrace
-
+        
       - name: Find current directory
         run: pwd
 
       - name: Check if APK exists
         run: |
           ls -R
-
+          
       - name: Generate Random Release Notes
         id: release_notes
         run: |
@@ -87,9 +63,9 @@ jobs:
           # Add the disclaimer
           FINAL_RELEASE_NOTES="$RANDOM_NOTE\n🚨 Test on company network only for full functionality for UAT/SIT testing!!"
           
-          echo "::set-output name=release_notes::$FINAL_RELEASE_NOTES"
+          echo "::set-output name=release_notes::$FINAL_RELEASE_NOTES"    
 
-      - name: Upload artifact to Firebase App Distribution
+      - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
