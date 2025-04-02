@@ -42,7 +42,6 @@ jobs:
         run: |
           version_code=$(grep "versionCode" app/build.gradle.kts | awk '{print $3}' | tr -d '\n')
           version_code=$((version_code + 1))
-          echo "VERSION_NAME=$version_name" >> $GITHUB_ENV
           echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
 
       # Step to increment the version code
@@ -50,7 +49,6 @@ jobs:
         run: |
           # Update build.gradle.kts with new version code and name
           sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
-          sed -i "s/versionName = \"[^\"]*\"/versionName = \"${{ env.VERSION_NAME }}\"/g" app/build.gradle.kts   
 
       # Build the app with the new version code
       - name: Build app
