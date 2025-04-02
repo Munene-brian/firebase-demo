@@ -52,8 +52,6 @@ jobs:
 
       - name: Commit updated build.gradle.kts
         run: |
-          git config --global user.name "Munene-brian"
-          git config --global user.email "brianmunene001@gmail.com"
           git add app/build.gradle.kts
           git commit -m "Increment versionCode to ${{ env.VERSION_CODE }}"
           git push
