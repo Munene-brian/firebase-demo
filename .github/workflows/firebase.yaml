@@ -37,37 +37,19 @@ jobs:
       - name: Grant rights to gradlew
         run: chmod +x ./gradlew
 
-      # - name: Get current version code
-      #   id: get_version_code
-      #   run: |
-      #     version_code=$(grep "versionCode" app/build.gradle.kts | awk '{print $3}' | tr -d '\n')
-      #     version_code=$((version_code + 1))
-      #     echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
-
-      # # Step to increment the version code
-      # - name: Increment version code
-      #   run: |
-      #     # Update build.gradle.kts with new version code and name
-      #     sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
-
-      - name: Get current version code and increment it
-        id: version_code
+      - name: Get current version code
+        id: get_version_code
         run: |
-          # Read the current version code from version.txt
-          if [ -f version.txt ]; then
-            version_code=$(cat version.txt)
-            
-          echo "Current version code is: $version_code"
+          version_code=$(grep "versionCode" app/build.gradle.kts | awk '{print $3}' | tr -d '\n')
+          version_code=$((version_code + 1))
+          echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
 
-          # Increment the version code by 1
-          new_version_code=$((version_code + 1))
-          echo "New version code is: $new_version_code"
-
-          # Save the new version code back to version.txt
-          echo $new_version_code > version.txt
-          
-          # Set the new version code as an environment variable for future steps
-          echo "VERSION_CODE=$new_version_code" >> $GITHUB_ENV        
+      # Step to increment the version code
+      - name: Increment version code
+        run: |
+          # Update build.gradle.kts with new version code and name
+          sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
+     
 
       # Build the app with the new version code
       - name: Build app
