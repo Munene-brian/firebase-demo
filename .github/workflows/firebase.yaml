@@ -52,6 +52,8 @@ jobs:
 
       - name: Commit updated build.gradle.kts
         run: |
+          git config --local user.email ${{ github.event.pusher.email || github.event.pull_request.user.email }}
+          git config --local user.name ${{ github.event.pusher.name || github.event.pull_request.user.login }}
           git add app/build.gradle.kts
           git commit -m "Increment versionCode to ${{ env.VERSION_CODE }}"
           git push
