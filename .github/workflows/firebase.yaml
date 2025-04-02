@@ -37,28 +37,20 @@ jobs:
       - name: Grant rights to gradlew
         run: chmod +x ./gradlew
 
-      # Step to get the current version code from build.gradle.kts
       - name: Get current version code
         id: get_version_code
         run: |
-          # Extract versionCode from build.gradle.kts (Kotlin DSL)
-          VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | sed 's/[^0-9]*\([0-9]\+\)[^0-9]*$/\1/')
-          echo "Current version code is $VERSION_CODE"
-          echo "::set-output name=version_code::$VERSION_CODE"
+          version_code=$(grep "versionCode" app/build.gradle.kts | awk '{print $3}' | tr -d '\n')
+          version_code=$((version_code + 1))
+          echo "VERSION_NAME=$version_name" >> $GITHUB_ENV
+          echo "VERSION_CODE=$version_code" >> $GITHUB_ENV
 
       # Step to increment the version code
       - name: Increment version code
         run: |
-          # Get the current version code from the output of the previous step
-          VERSION_CODE=${{ steps.get_version_code.outputs.version_code }}
-          NEW_VERSION_CODE=$((VERSION_CODE + 1))
-          echo "New version code: $NEW_VERSION_CODE"
-          
-          # Update the version code in build.gradle.kts
-          sed -i "s/versionCode $VERSION_CODE/versionCode $NEW_VERSION_CODE/" app/build.gradle.kts
-          
-          # Output the new version code for debugging
-          echo "::set-output name=new_version_code::$NEW_VERSION_CODE"
+          # Update build.gradle.kts with new version code and name
+          sed -i "s/versionCode = [0-9]\+/versionCode = ${{ env.VERSION_CODE }}/g" app/build.gradle.kts
+          sed -i "s/versionName = \"[^\"]*\"/versionName = \"${{ env.VERSION_NAME }}\"/g" app/build.gradle.kts   
 
       # Build the app with the new version code
       - name: Build app
